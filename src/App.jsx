@@ -1,63 +1,98 @@
 import React, { useState, useEffect } from 'react';
-//import RouteSwitch from './RouteSwitch';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import uniqid from 'uniqid';
 import Cart from './pages/Cart';
 import Home from './pages/Home';
 import ErrorPage from './pages/ErrorPage';
 import CompComponent from './pages/Comp/CompComponent';
-//Assets
-import { i3_10100, r3_3100 } from './assets';
+//data
+import { products } from './data';
 
 function App() {
 	const [cart, setCart] = useState([]);
+	const [cartTotal, setCartTotal] = useState(0);
+	useEffect(() => {
+		if (sessionStorage.length !== 0) {
+			const cartSession = JSON.parse(sessionStorage.cart);
+			setCart(cartSession);
+			setCartTotal(sessionStorage.total);
+		}
+	}, []);
 
-	const [cpu, setCpu] = useState([
+	const [category, setCategory] = useState([
 		{
 			id: 0,
-			brand: 'Intel',
-			model: 'Core™ i3-10100',
-			price: 110.99,
-			scoket: '1200',
-			architecture: 'Comet Lake',
-			cores: 4,
-			threads: 8,
-			operatingFreq: 3.7,
-			turboFreq: 4.4,
-			L3Cache: '6MB',
-			thumb: i3_10100,
-			url: `./product-i3_10100`,
+			name: 'All Products',
+			url: '/components',
+			data: products,
 		},
 		{
 			id: 1,
-			brand: 'AMD',
-			model: 'Ryzen™ 3 3100',
-			price: 133.95,
-			scoket: 'AM4',
-			architecture: 'Zen',
-			cores: 4,
-			threads: 8,
-			operatingFreq: 3.6,
-			turboFreq: 3.9,
-			L3Cache: '16MB',
-			thumb: r3_3100,
-			url: `./product-cpu-r3_3100`,
+			name: 'Processors',
+			url: '/components-cpu',
+			data: products.filter(function (product) {
+				return product.category == 'cpu';
+			}),
 		},
-	]);
-
-	const [comps, setComps] = useState([
-		{ id: 0, name: 'Processors', url: '/components-cpu', data: cpu },
 		{
-			id: 1,
+			id: 2,
 			name: 'Motherbaords',
 			url: '/components-motheboard',
-			data: [],
+			data: products.filter(function (product) {
+				return product.category == 'mboard';
+			}),
 		},
-		{ id: 2, name: 'RAM', url: '/components-ram', data: [] },
-		{ id: 3, name: 'PSU', url: '/components-psu', data: [] },
+		{
+			id: 3,
+			name: 'RAM',
+			url: '/components-ram',
+			data: products.filter(function (product) {
+				return product.category == 'ram';
+			}),
+		},
+		/*{ id: 3, name: 'PSU', url: '/components-psu', data: [] },
 		{ id: 4, name: 'Storage', url: '/components-storage', data: [] },
 		{ id: 5, name: 'Graphics Card', url: '/components-gpu', data: [] },
-		{ id: 6, name: 'Chassis', url: '/components-chassis', data: [] },
+		{ id: 6, name: 'Chassis', url: '/components-chassis', data: [] }, */
 	]);
+
+	const addToCart = (e) => {
+		const cartTemp = [...cart];
+		const index = products.findIndex((object) => {
+			return object.id === parseInt(e.target.id);
+		});
+		const item = products[index];
+
+		const newItem = {
+			id: uniqid(),
+			brand: item.brand,
+			model: item.model,
+			price: item.price,
+			thumb: item.thumb,
+		};
+
+		cartTemp.push(newItem);
+		console.log(newItem);
+		setCart(cartTemp);
+		sessionStorage.setItem('cart', JSON.stringify(cartTemp));
+		cartSum(cartTemp);
+	};
+
+	const cartSum = (cartTemp) => {
+		const itemPrices = [];
+		cartTemp.forEach((prices) => {
+			itemPrices.push(prices.price);
+		});
+		console.log(itemPrices);
+
+		let sum = (...numbers) => {
+			return numbers.reduce((prev, current) => prev + current);
+		};
+		const finalTotal = Math.round(sum(...itemPrices) * 100) / 100;
+		console.log(finalTotal);
+		setCartTotal(parseFloat(finalTotal));
+		sessionStorage.setItem('total', finalTotal);
+	};
 
 	return (
 		<React.Fragment>
@@ -67,22 +102,30 @@ function App() {
 						<a href="./">Home</a>
 						<ul className="navList">
 							<li>
-								<a href="./components-cpu">Components</a>
+								<a href="./components">Components</a>
 							</li>
 							<li>
-								<a href="./about">Cart</a>
+								<a href="./cart">Cart - {cart.length}</a>
 							</li>
 						</ul>
 					</nav>
+
 					<Routes>
 						<Route path="/" element={<Home />} />
-						<Route path="/about" element={<Cart />} />
-						{comps.map((data) => (
+						<Route
+							path="/cart"
+							element={<Cart data={cart} total={cartTotal} />}
+						/>
+						{category.map((data) => (
 							<Route
 								key={data.id}
 								path={data.url}
 								element={
-									<CompComponent data={data} comps={comps} />
+									<CompComponent
+										data={data}
+										category={category}
+										addToCart={(e) => addToCart(e)}
+									/>
 								}
 							/>
 						))}
