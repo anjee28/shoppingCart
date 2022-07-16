@@ -56,11 +56,15 @@ function App() {
 		{ id: 6, name: 'Chassis', url: '/components-chassis', data: [] }, */
 	]);
 
+	//Add to cart Function
 	const addToCart = (e) => {
 		const cartTemp = [...cart];
+		//find the index of the product from products data using id
 		const index = products.findIndex((object) => {
 			return object.id === parseInt(e.target.id);
 		});
+
+		//item is the product that matches the id
 		const item = products[index];
 
 		const newItem = {
@@ -69,6 +73,7 @@ function App() {
 			model: item.model,
 			price: item.price,
 			thumb: item.thumb,
+			quantity: 1,
 		};
 
 		cartTemp.push(newItem);
@@ -81,7 +86,7 @@ function App() {
 	const cartSum = (cartTemp) => {
 		const itemPrices = [];
 		cartTemp.forEach((prices) => {
-			itemPrices.push(prices.price);
+			itemPrices.push(prices.price * prices.quantity);
 		});
 		console.log(itemPrices);
 
@@ -92,6 +97,18 @@ function App() {
 		console.log(finalTotal);
 		setCartTotal(parseFloat(finalTotal));
 		sessionStorage.setItem('total', finalTotal);
+	};
+
+	const addQuantity = (e) => {
+		const cartTemp = [...cart];
+		const id = e.target.id;
+		const index = cartTemp.findIndex((object) => {
+			return object.id === id;
+		});
+		cartTemp[index].quantity++;
+		setCart(cartTemp);
+		sessionStorage.setItem('cart', JSON.stringify(cartTemp));
+		cartSum(cartTemp);
 	};
 
 	return (
@@ -114,7 +131,13 @@ function App() {
 						<Route path="/" element={<Home />} />
 						<Route
 							path="/cart"
-							element={<Cart data={cart} total={cartTotal} />}
+							element={
+								<Cart
+									data={cart}
+									total={cartTotal}
+									add={addQuantity}
+								/>
+							}
 						/>
 						{category.map((data) => (
 							<Route
