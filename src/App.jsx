@@ -31,7 +31,7 @@ function App() {
 			name: 'Processors',
 			url: '/components-cpu',
 			data: products.filter(function (product) {
-				return product.category == 'cpu';
+				return product.category === 'cpu';
 			}),
 		},
 		{
@@ -39,7 +39,7 @@ function App() {
 			name: 'Motherbaords',
 			url: '/components-motheboard',
 			data: products.filter(function (product) {
-				return product.category == 'mboard';
+				return product.category === 'mboard';
 			}),
 		},
 		{
@@ -47,7 +47,7 @@ function App() {
 			name: 'RAM',
 			url: '/components-ram',
 			data: products.filter(function (product) {
-				return product.category == 'ram';
+				return product.category === 'ram';
 			}),
 		},
 		/*{ id: 3, name: 'PSU', url: '/components-psu', data: [] },
@@ -57,53 +57,72 @@ function App() {
 	]);
 
 	//Add to cart Function
-	const addToCart = (e) => {
+	const addToCart = (id) => {
 		const cartTemp = [...cart];
+
+		const indexCart = cartTemp.findIndex((object) => {
+			return object.productId === parseInt(id);
+		});
+
 		//find the index of the product from products data using id
-		const index = products.findIndex((object) => {
-			return object.id === parseInt(e.target.id);
+		const indexItem = products.findIndex((object) => {
+			return object.id === parseInt(id);
 		});
 
 		//item is the product that matches the id
-		const item = products[index];
+		const item = products[indexItem];
+		console.log(id);
 
-		const newItem = {
-			id: uniqid(),
-			brand: item.brand,
-			model: item.model,
-			price: item.price,
-			thumb: item.thumb,
-			quantity: 1,
-		};
+		if (cartTemp[indexCart] === undefined) {
+			//creats new entry to the cart
+			const newItem = {
+				id: uniqid(),
+				productId: item.id,
+				brand: item.brand,
+				model: item.model,
+				price: item.price,
+				thumb: item.thumb,
+				quantity: 1,
+			};
 
-		cartTemp.push(newItem);
-		console.log(newItem);
-		setCart(cartTemp);
-		sessionStorage.setItem('cart', JSON.stringify(cartTemp));
-		cartSum(cartTemp);
+			cartTemp.push(newItem); //adds the new entry to the cart
+			setCart(cartTemp);
+			sessionStorage.setItem('cart', JSON.stringify(cartTemp));
+
+			cartSum(cartTemp); //computes the total amount of the cart
+		} else {
+			addQuantity(id);
+		}
 	};
 
 	const cartSum = (cartTemp) => {
 		const itemPrices = [];
+		let finalTotal;
 		cartTemp.forEach((prices) => {
 			itemPrices.push(prices.price * prices.quantity);
 		});
-		console.log(itemPrices);
 
 		let sum = (...numbers) => {
 			return numbers.reduce((prev, current) => prev + current);
 		};
-		const finalTotal = Math.round(sum(...itemPrices) * 100) / 100;
-		console.log(finalTotal);
+
+		if (itemPrices.length === 0) {
+			finalTotal = 0;
+		} else {
+			finalTotal = Math.round(sum(...itemPrices) * 100) / 100;
+		}
+
 		setCartTotal(parseFloat(finalTotal));
 		sessionStorage.setItem('total', finalTotal);
 	};
 
-	const addQuantity = (e) => {
+	const addQuantity = (id) => {
 		const cartTemp = [...cart];
-		const id = e.target.id;
+		const productId = id;
+		console.log(cartTemp);
+		console.log(productId);
 		const index = cartTemp.findIndex((object) => {
-			return object.id === id;
+			return object.productId === parseInt(productId);
 		});
 		cartTemp[index].quantity++;
 		setCart(cartTemp);
@@ -111,22 +130,90 @@ function App() {
 		cartSum(cartTemp);
 	};
 
+	const subtractQuantity = (e) => {
+		const cartTemp = [...cart];
+		const id = e.target.id;
+		const index = cartTemp.findIndex((object) => {
+			return object.id === id;
+		});
+		if (cartTemp[index].quantity === 1) {
+			deleteEntry(e);
+		} else {
+			cartTemp[index].quantity--;
+			setCart(cartTemp);
+			sessionStorage.setItem('cart', JSON.stringify(cartTemp));
+			cartSum(cartTemp);
+		}
+	};
+
+	const deleteEntry = (e) => {
+		const cartTemp = [...cart];
+		const id = e.target.id;
+		const index = cartTemp.findIndex((object) => {
+			return object.id === id;
+		});
+		cartTemp.splice(index, 1);
+		setCart(cartTemp);
+		sessionStorage.setItem('cart', JSON.stringify(cartTemp));
+		cartSum(cartTemp);
+	};
+
 	return (
 		<React.Fragment>
-			<div>
-				<Router>
-					<nav>
-						<a href="./">Home</a>
-						<ul className="navList">
-							<li>
-								<a href="./components">Components</a>
-							</li>
-							<li>
-								<a href="./cart">Cart - {cart.length}</a>
-							</li>
-						</ul>
-					</nav>
-
+			<Router>
+				<nav>
+					<div className="logo">
+						<div
+							className="home"
+							onClick={(event) => (window.location.href = './')}
+						>
+							<svg idth="32px" height="32px" viewBox="0 0 24 24">
+								<path
+									fill="currentColor"
+									d="M6,2C4.89,2 4,2.89 4,4V12C4,13.11 4.89,14 6,14H18C19.11,14 20,13.11 20,12V4C20,2.89 19.11,2 18,2H6M6,4H18V12H6V4M4,15C2.89,15 2,15.89 2,17V20C2,21.11 2.89,22 4,22H20C21.11,22 22,21.11 22,20V17C22,15.89 21.11,15 20,15H4M8,17H20V20H8V17M9,17.75V19.25H13V17.75H9M15,17.75V19.25H19V17.75H15Z"
+								/>
+							</svg>
+							<span>ezPC</span>
+						</div>
+					</div>
+					<div className="navs">
+						<div className="navLinks">
+							<div
+								className="components"
+								onClick={(event) =>
+									(window.location.href = './components')
+								}
+							>
+								<span>Components</span>
+							</div>
+							<div
+								className="components"
+								onClick={(event) =>
+									(window.location.href = './components')
+								}
+							>
+								<span>Peripherals</span>
+							</div>
+							<div
+								className="components"
+								onClick={(event) =>
+									(window.location.href = './components')
+								}
+							>
+								<span>Accessories</span>
+							</div>
+						</div>
+						<div
+							className="cart"
+							onClick={(event) =>
+								(window.location.href = './cart')
+							}
+						>
+							<span>Cart - {cart.length}</span>
+						</div>
+					</div>
+				</nav>
+				<div className="mainBody">
 					<Routes>
 						<Route path="/" element={<Home />} />
 						<Route
@@ -136,6 +223,8 @@ function App() {
 									data={cart}
 									total={cartTotal}
 									add={addQuantity}
+									minus={subtractQuantity}
+									delete={deleteEntry}
 								/>
 							}
 						/>
@@ -147,15 +236,16 @@ function App() {
 									<CompComponent
 										data={data}
 										category={category}
-										addToCart={(e) => addToCart(e)}
+										addToCart={addToCart}
 									/>
 								}
 							/>
 						))}
 						<Route path="*" element={<ErrorPage />} />
 					</Routes>
-				</Router>
-			</div>
+				</div>
+				<div className="bg-sky-500 h-[6vh]"></div>
+			</Router>
 		</React.Fragment>
 	);
 }

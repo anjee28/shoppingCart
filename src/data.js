@@ -97,7 +97,8 @@ const ram01 = {
 	thumb: elitePlus_double_thumb,
 };
 
-const ramData = [ram00, ram01];
+
+//const ramData = [ram00, ram01];
 const products = [cpu00, cpu01, mboard00, mboard01, ram00, ram01];
 //####----Exports----#####
-export { cpuData, mboardData, ramData, products };
+export { products };

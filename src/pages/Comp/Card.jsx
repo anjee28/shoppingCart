@@ -1,26 +1,26 @@
-import { data } from 'autoprefixer';
 import React from 'react';
 
 function Card(props) {
 	return (
-		<div className="border bg-slate-200 p-2 flex flex-col w-52 h-80">
+		<div className=" bg-white p-2 flex flex-col w-52 h-[21rem] hover:shadow-lg hover:border">
 			<div className="grow">
 				<a href={props.data.url}>
 					<div className="">
 						<img src={props.data.thumb} alt={props.data.model} />
 					</div>
-					<h4>
+					<div className="mt-1 text-left font-semibold">
 						{props.data.brand} {props.data.model}
-					</h4>
+					</div>
 				</a>
 			</div>
 			<div>
-				<h4>${props.data.price}</h4>
+				<div className="text-left text-xl mb-2">
+					${props.data.price}
+				</div>
 			</div>
 			<div
-				id={props.data.id}
-				className="bg-slate-700 text-white py-2 w-full"
-				onClick={props.addToCart}
+				className="bg-sky-500 text-white py-2 w-full hover:bg-sky-300 cursor-pointer"
+				onClick={() => props.addToCart(props.data.id)}
 			>
 				Add to Cart
 			</div>

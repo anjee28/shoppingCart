@@ -6,20 +6,60 @@
 
 body {
 	font-family: 'Open Sans', sans-serif;
+	height: 100vh;
+	@apply text-sm;
+}
+
+.root {
+	height: 100%;
+}
+
+.mainBody {
+	height: 86vh;
 }
 
 nav {
-	@apply bg-slate-700 text-white flex justify-between items-center px-8;
-	height: 8vh;
+	@apply bg-sky-600 text-white flex items-center h-[8vh];
 }
 
-.navList {
-	@apply flex justify-around w-1/2;
+.logo {
+	@apply flex-1 h-full items-center;
+}
+
+.home {
+	@apply w-[220px] flex items-center justify-center hover:bg-sky-400 h-full cursor-pointer;
+}
+
+.home a {
+	@apply text-2xl font-black;
+}
+
+.navs {
+	@apply flex w-[450px] h-full;
+}
+
+.navLinks {
+	@apply flex-1 flex justify-center;
+}
+
+.navLinks div {
+	@apply h-full hover:bg-sky-500 flex items-center px-4;
+}
+
+.cart {
+	@apply hover:bg-sky-500 flex items-center px-4;
 }
 
 .sideNav {
-	height: 92vh;
-	@apply flex-none;
+	@apply flex-none h-full w-[220px] bg-slate-100 px-8 py-12 text-black;
+}
+
+.category {
+	@apply mb-2;
+}
+
+.products {
+	@apply grow flex flex-col text-center h-full overflow-y-scroll pb-8;
 }
 
 .cartItems {
@@ -31,7 +71,7 @@ nav {
 }
 
 .product {
-	@apply flex-1 h-full flex items-center font-semibold;
+	@apply flex-1 flex items-center font-semibold;
 }
 
 .unitPrice {
@@ -47,7 +87,7 @@ nav {
 }
 
 .total {
-	@apply w-24 h-full flex items-center justify-center;
+	@apply w-24 h-full flex items-center justify-between px-4 font-semibold;
 }
 
 .remove {
