@@ -195,6 +195,7 @@ function App() {
               >
                 <span>Components</span>
               </div>
+              {/*
               <div
                 className="components"
                 onClick={(event) => (window.location.href = "./#/components")}
@@ -207,6 +208,7 @@ function App() {
               >
                 <span>Accessories</span>
               </div>
+              */}
             </div>
             <div
               className="cart"

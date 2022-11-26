@@ -1,9 +1,9 @@
 function Home() {
-	return (
-		<div>
-			<h1>Home Page under construction. Click on shop to proceed</h1>
-		</div>
-	);
+  return (
+    <div className="flex justify-center items-center h-[86vh] text-9xl">
+      <h1>Sample Home Page</h1>
+    </div>
+  );
 }
 
 export default Home;
